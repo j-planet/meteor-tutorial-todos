@@ -5,6 +5,7 @@ meteor npm install --save react react-dom react-addons-pure-render-mixin bcrypt 
 
 meteor add react-meteor-data
 meteor add accounts-ui accounts-password
+meteor add practicalmeteor:mocha
 
 meteor remove insecure
 meteor remove autopublish
