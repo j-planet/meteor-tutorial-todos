@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import ReactDOM from 'react-dom';
 import { createContainer } from 'meteor/react-meteor-data';
 
 import Task from './task';
@@ -7,21 +8,54 @@ import { TaskData } from '../../api/tasks';
 
 class App extends Component {
 
-    constructor(props) {
+    constructor(props)
+    {
         super(props);
     }
 
-    renderTasks() {
+    handleSubmit(event)
+    {
+        event.preventDefault();
+
+        // the field of interest
+        const field = ReactDOM.findDOMNode(this.refs.textInput);
+
+        // retrieve text input value
+        const text = field.value.trim();
+
+        // Clear form
+        field.value = '';
+
+        // insert into the database via API
+        TaskData.insert({
+            text,
+            createdAt: new Date()
+        });
+    }
+
+    renderTasks()
+    {
         return this.props.tasks.map
         (
             (task) => <Task key={task._id} task={task} />
         );
     }
 
-    render() {
+    render()
+    {
         return (
-            <div>
-                <h1>Hello, welcome to App.</h1>
+            <div className="container">
+                <header>
+                    <h1>Todo List</h1>
+
+                    <form className="new-task" onSubmit={this.handleSubmit.bind(this)} >
+                        <input
+                            type="text"
+                            ref="textInput"
+                            placeholder="Type here to add new tasks."
+                        />
+                    </form>
+                </header>
 
                 <ul>
                     { this.renderTasks()}
@@ -38,7 +72,7 @@ App.propTypes = {
 export default createContainer(
     () => {
         return {
-            tasks: TaskData.find({}).fetch()
+            tasks: TaskData.find({}, { sort: {createdAt: -1} }).fetch()
         };
     },
     App
