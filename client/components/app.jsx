@@ -4,7 +4,7 @@ import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 
 import Task from './task';
-import { TaskData } from '../../api/task_data';
+import { TaskCollection } from '../../api/task_api';
 import AccountsUIWrapper from './accountsUIWrapper';
 
 
@@ -36,12 +36,7 @@ class App extends Component {
         field.value = '';
 
         // insert into the database via API
-        TaskData.insert({
-            text,
-            createdAt: new Date(),
-            owner: Meteor.userId(),
-            username: Meteor.user().username
-        });
+        Meteor.call('tasks.insert', text);
     }
 
     renderTasks()
@@ -109,7 +104,7 @@ App.propTypes = {
 export default createContainer(
     () => {
         return {
-            tasks: TaskData.find({}, { sort: {createdAt: -1} }).fetch(),
+            tasks: TaskCollection.find({}, { sort: {createdAt: -1} }).fetch(),
             currentUser: Meteor.user()
         };
     },

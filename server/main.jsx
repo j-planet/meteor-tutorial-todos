@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { TaskData } from '../api/task_data';
+import { TaskCollection } from '../api/task_api';
 
 
 Meteor.startup(() => {
