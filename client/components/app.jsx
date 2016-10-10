@@ -1,9 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
+import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 
 import Task from './task';
 import { TaskData } from '../../api/task_data';
+import AccountsUIWrapper from './accountsUIWrapper';
 
 
 class App extends Component {
@@ -36,7 +38,9 @@ class App extends Component {
         // insert into the database via API
         TaskData.insert({
             text,
-            createdAt: new Date()
+            createdAt: new Date(),
+            owner: Meteor.userId(),
+            username: Meteor.user().username
         });
     }
 
@@ -74,13 +78,19 @@ class App extends Component {
                         Hide Completed Tasks
                     </label>
 
-                    <form className="new-task" onSubmit={this.handleNewTaskSubmit.bind(this)} >
-                        <input
-                            type="text"
-                            ref="textInput"
-                            placeholder="Type here to add new tasks."
-                        />
-                    </form>
+                    <AccountsUIWrapper />
+
+                    { this.props.currentUser
+                        ?
+                        <form className="new-task" onSubmit={this.handleNewTaskSubmit.bind(this)}>
+                            <input
+                                type="text"
+                                ref="textInput"
+                                placeholder="Type here to add new tasks."
+                            />
+                        </form>
+                        : ''
+                    }
                 </header>
 
                 <ul>
@@ -92,13 +102,15 @@ class App extends Component {
 }
 
 App.propTypes = {
-    tasks: PropTypes.array.isRequired
+    tasks: PropTypes.array.isRequired,
+    currentUser: PropTypes.object
 };
 
 export default createContainer(
     () => {
         return {
-            tasks: TaskData.find({}, { sort: {createdAt: -1} }).fetch()
+            tasks: TaskData.find({}, { sort: {createdAt: -1} }).fetch(),
+            currentUser: Meteor.user()
         };
     },
     App
